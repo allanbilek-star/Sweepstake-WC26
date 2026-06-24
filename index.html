@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khan Family World Cup Sweepstake 2026</title>
+<style>
+  /* ============================================================
+     EDIT POINTS QUICKLY:
+     1. To update a team's progress, find the TEAMS data block
+        below (in the <script>) and change its "stage" value.
+        Allowed stages: "group", "r32", "r16", "qf", "sf",
+        "final", "champion", "out"
+     2. Save the file. The leaderboard recalculates automatically.
+     ============================================================ */
+
+  :root{
+    --pitch:#0a1f17;
+    --pitch-deep:#06140e;
+    --line:#1d3b2d;
+    --chalk:#eaf2ec;
+    --muted:#7e9a8b;
+    --gold:#f4c33a;
+    --gold-deep:#c89212;
+    --live:#3ddc84;
+    --out:#5a4040;
+    --card:#0e2a1f;
+    --card-hi:#123528;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:
+      radial-gradient(120% 80% at 50% -10%, #103726 0%, transparent 60%),
+      linear-gradient(180deg,var(--pitch) 0%,var(--pitch-deep) 100%);
+    background-color:var(--pitch-deep);
+    color:var(--chalk);
+    font-family:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+    min-height:100vh;
+    padding:0 0 64px;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 18px}
+
+  /* Header */
+  header{
+    position:relative;
+    padding:38px 18px 30px;
+    text-align:center;
+    border-bottom:1px solid var(--line);
+    background:
+      repeating-linear-gradient(90deg,transparent 0 38px,rgba(255,255,255,.012) 38px 76px);
+  }
+  .eyebrow{
+    font-size:12px;letter-spacing:.32em;text-transform:uppercase;
+    color:var(--gold);font-weight:700;margin-bottom:12px;
+  }
+  h1{
+    font-family:"Archivo Black","Arial Black",sans-serif;
+    font-weight:900;
+    font-size:clamp(30px,8vw,52px);
+    line-height:.94;
+    letter-spacing:-.02em;
+    text-transform:uppercase;
+  }
+  h1 .accent{color:var(--gold);display:block}
+  .pot{
+    margin-top:18px;display:inline-flex;gap:18px;align-items:center;
+    font-size:13px;color:var(--muted);
+    border:1px solid var(--line);border-radius:100px;
+    padding:8px 18px;
+  }
+  .pot b{color:var(--chalk)}
+  .pot .dot{width:5px;height:5px;border-radius:50%;background:var(--line)}
+
+  /* Section label */
+  .seclabel{
+    display:flex;align-items:center;gap:12px;
+    margin:38px 0 16px;
+    font-size:12px;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--muted);font-weight:700;
+  }
+  .seclabel::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  /* Leaderboard */
+  .board{display:flex;flex-direction:column;gap:10px}
+  .row{
+    display:grid;
+    grid-template-columns:38px 1fr auto;
+    align-items:center;
+    gap:14px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 16px;
+    transition:transform .45s cubic-bezier(.2,.8,.2,1),background .3s;
+    position:relative;
+    overflow:hidden;
+  }
+  .row.lead{
+    background:linear-gradient(100deg,var(--card-hi),var(--card));
+    border-color:var(--gold-deep);
+  }
+  .row.lead::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);
+  }
+  .rank{
+    font-family:"Archivo Black","Arial Black",sans-serif;
+    font-size:22px;text-align:center;color:var(--muted);
+  }
+  .row.lead .rank{color:var(--gold)}
+  .who{min-width:0}
+  .who .name{font-weight:800;font-size:17px;letter-spacing:-.01em}
+  .who .sub{font-size:12px;color:var(--muted);margin-top:3px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pts{text-align:right}
+  .pts .val{
+    font-family:"Archivo Black","Arial Black",sans-serif;
+    font-size:26px;line-height:1;color:var(--chalk);
+  }
+  .row.lead .pts .val{color:var(--gold)}
+  .pts .unit{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+
+  .movedelta{
+    font-size:11px;color:var(--live);font-weight:700;margin-top:2px;
+  }
+
+  /* Squad detail cards */
+  .squads{display:flex;flex-direction:column;gap:14px;margin-top:6px}
+  .squad{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    overflow:hidden;
+  }
+  .squad-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:15px 18px;cursor:pointer;user-select:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);
+  }
+  .squad-head .left{display:flex;align-items:center;gap:13px;min-width:0}
+  .squad-head .pos{
+    font-family:"Archivo Black",sans-serif;font-size:15px;color:var(--muted);
+    width:24px;text-align:center;flex-shrink:0;
+  }
+  .squad-head .nm{font-weight:800;font-size:16px}
+  .squad-head .tot{
+    font-family:"Archivo Black",sans-serif;font-size:20px;color:var(--gold);
+    flex-shrink:0;
+  }
+  .squad-head .tot small{font-size:10px;color:var(--muted);letter-spacing:.15em;display:block;text-align:right;font-family:inherit;font-weight:600}
+  .chev{transition:transform .3s;color:var(--muted);margin-left:10px}
+  .squad.open .chev{transform:rotate(180deg)}
+
+  .teams{
+    max-height:0;overflow:hidden;transition:max-height .4s ease;
+  }
+  .squad.open .teams{max-height:600px}
+  .team{
+    display:grid;grid-template-columns:30px 1fr auto auto;
+    align-items:center;gap:12px;
+    padding:11px 18px;border-top:1px solid var(--line);
+    font-size:14px;
+  }
+  .team .flag{font-size:20px;line-height:1}
+  .team .tn{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .badge{
+    font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    padding:4px 9px;border-radius:100px;white-space:nowrap;
+  }
+  .b-group{background:rgba(126,154,139,.16);color:#a9c2b4}
+  .b-live{background:rgba(61,220,132,.14);color:var(--live)}
+  .b-out{background:rgba(200,120,120,.14);color:#d98b8b}
+  .b-champ{background:var(--gold);color:#1a1206}
+  .tpts{
+    font-family:"Archivo Black",sans-serif;font-size:15px;
+    min-width:34px;text-align:right;
+  }
+  .tpts.zero{color:var(--muted)}
+
+  /* Scoring reference */
+  .scoretable{
+    border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  }
+  .st-row{display:grid;grid-template-columns:1fr auto;padding:11px 16px;font-size:14px}
+  .st-row:not(:last-child){border-bottom:1px solid var(--line)}
+  .st-row span:last-child{font-family:"Archivo Black",sans-serif;color:var(--gold)}
+  .st-row.head{background:rgba(255,255,255,.03);font-weight:800;letter-spacing:.05em;
+    text-transform:uppercase;font-size:11px;color:var(--muted)}
+  .st-row.head span:last-child{color:var(--muted);font-family:inherit}
+
+  footer{
+    text-align:center;margin-top:44px;padding-top:24px;
+    border-top:1px solid var(--line);
+    font-size:12px;color:var(--muted);line-height:1.7;
+  }
+  .stamp{color:var(--gold);font-weight:700}
+
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px;justify-content:center}
+  .legend .badge{cursor:default}
+
+  @media (max-width:480px){
+    .who .name{font-size:16px}
+    .pts .val{font-size:23px}
+    .team{grid-template-columns:26px 1fr auto auto;gap:9px;font-size:13px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Khan Family · Canada · Mexico · USA</div>
+  <h1>World Cup<span class="accent">Sweepstake</span></h1>
+  <div class="pot">
+    <span><b>8</b> players</span><span class="dot"></span>
+    <span><b>£80</b> pot</span><span class="dot"></span>
+    <span><b>6</b> teams each</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="seclabel">Live Standings</div>
+  <div class="board" id="board"></div>
+
+  <div class="seclabel">Squads &amp; Team Points</div>
+  <div class="legend">
+    <span class="badge b-live">Advancing</span>
+    <span class="badge b-group">In group stage</span>
+    <span class="badge b-out">Eliminated</span>
+    <span class="badge b-champ">Champion</span>
+  </div>
+  <div class="squads" id="squads"></div>
+
+  <div class="seclabel">How Points Work</div>
+  <div class="scoretable">
+    <div class="st-row head"><span>Stage reached</span><span>Points</span></div>
+    <div class="st-row"><span>Eliminated in group stage</span><span>0</span></div>
+    <div class="st-row"><span>Qualify — Round of 32</span><span>10</span></div>
+    <div class="st-row"><span>Round of 16</span><span>19</span></div>
+    <div class="st-row"><span>Quarter-final</span><span>28</span></div>
+    <div class="st-row"><span>Semi-final</span><span>37</span></div>
+    <div class="st-row"><span>Final (runner-up)</span><span>45</span></div>
+    <div class="st-row"><span>Champion</span><span>53</span></div>
+  </div>
+  <p style="font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.6">
+    Points are cumulative and capped gently at the top — winning the
+    World Cup is worth only 8 more than reaching the final, so consistent
+    deep runs across several teams beat holding a single champion.
+  </p>
+
+  <footer>
+    Last updated <span class="stamp" id="updated">—</span><br>
+    Group stage in progress · First qualifiers through to the Round of 32<br>
+    <span style="opacity:.7">Tap any squad to see team-by-team points</span>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   1.  SCORING  — cumulative points per stage reached
+   ============================================================ */
+const POINTS = {
+  out:      0,   // eliminated in group stage
+  group:    0,   // still in group stage (not yet qualified)
+  r32:     10,   // qualified to Round of 32
+  r16:     19,
+  qf:      28,
+  sf:      37,
+  final:   45,   // runner-up
+  champion:53
+};
+const STAGE_LABEL = {
+  out:"Eliminated", group:"Group stage", r32:"Round of 32",
+  r16:"Round of 16", qf:"Quarter-final", sf:"Semi-final",
+  final:"Finalist", champion:"Champion"
+};
+
+/* ============================================================
+   2.  TEAMS  — every team's current "stage".
+       >>> TO UPDATE RESULTS: change the stage value here. <<<
+       Stages: "group" "r32" "r16" "qf" "sf" "final" "champion" "out"
+       (Group stage is live now, so everyone starts at "group".)
+   ============================================================ */
+const PLAYERS = [
+  { name:"Mama",   handle:"Sameena", teams:[
+    ["England","🏴󠁧󠁢󠁥󠁮󠁧󠁿","group"], ["Morocco","🇲🇦","group"], ["Türkiye","🇹🇷","out"],
+    ["Paraguay","🇵🇾","group"], ["Scotland","🏴󠁧󠁢󠁳󠁣󠁴󠁿","group"], ["New Zealand","🇳🇿","group"]
+  ]},
+  { name:"Paps",   handle:"Hassan", teams:[
+    ["Argentina","🇦🇷","r32"], ["Belgium","🇧🇪","group"], ["Australia","🇦🇺","group"],
+    ["Czechia","🇨🇿","group"], ["Uzbekistan","🇺🇿","group"], ["Qatar","🇶🇦","group"]
+  ]},
+  { name:"Baaj",   handle:"Baaj", teams:[
+    ["Germany","🇩🇪","r32"], ["Croatia","🇭🇷","group"], ["Egypt","🇪🇬","group"],
+    ["Côte d’Ivoire","🇨🇮","group"], ["Saudi Arabia","🇸🇦","group"], ["Cabo Verde","🇨🇻","group"]
+  ]},
+  { name:"Allan",  handle:"Allan", teams:[
+    ["Brazil","🇧🇷","group"], ["Mexico","🇲🇽","r32"], ["Ecuador","🇪🇨","group"],
+    ["Norway","🇳🇴","r32"], ["Tunisia","🇹🇳","out"], ["Iraq","🇮🇶","group"]
+  ]},
+  { name:"Saif",   handle:"Saifullah", teams:[
+    ["Portugal","🇵🇹","group"], ["Colombia","🇨🇴","r32"], ["Austria","🇦🇹","group"],
+    ["Sweden","🇸🇪","group"], ["Ghana","🇬🇭","group"], ["Haiti","🇭🇹","out"]
+  ]},
+  { name:"Aroosa", handle:"Aroosa", teams:[
+    ["France","🇫🇷","r32"], ["Uruguay","🇺🇾","group"], ["Switzerland","🇨🇭","group"],
+    ["Canada","🇨🇦","group"], ["South Africa","🇿🇦","group"], ["Jordan","🇯🇴","group"]
+  ]},
+  { name:"Nikhil", handle:"Nikhil", teams:[
+    ["Netherlands","🇳🇱","group"], ["Japan","🇯🇵","group"], ["Korea Republic","🇰🇷","group"],
+    ["Panama","🇵🇦","group"], ["Bosnia & Herzegovina","🇧🇦","group"], ["Curaçao","🇨🇼","group"]
+  ]},
+  { name:"Alisha", handle:"Alisha", teams:[
+    ["Spain","🇪🇸","group"], ["Senegal","🇸🇳","group"], ["Algeria","🇩🇿","group"],
+    ["IR Iran","🇮🇷","group"], ["Congo DR","🇨🇩","group"], ["USA","🇺🇸","r32"]
+  ]}
+];
+
+/* Date this data reflects */
+const UPDATED = "24 June 2026 · Matchday 3 begins";
+
+/* ============================================================
+   3.  RENDER
+   ============================================================ */
+function teamPoints(stage){ return POINTS[stage] ?? 0; }
+function badgeClass(stage){
+  if(stage==="champion") return "b-champ";
+  if(stage==="out")      return "b-out";
+  if(stage==="group")    return "b-group";
+  return "b-live";
+}
+function shortStage(stage){
+  return STAGE_LABEL[stage] || stage;
+}
+
+const standings = PLAYERS.map(p=>{
+  const total = p.teams.reduce((s,t)=>s+teamPoints(t[2]),0);
+  const alive = p.teams.filter(t=>t[2]!=="out").length;
+  return {...p, total, alive};
+}).sort((a,b)=> b.total-a.total || b.alive-a.alive || a.name.localeCompare(b.name));
+
+/* Leaderboard */
+const board = document.getElementById("board");
+const topScore = standings[0].total;
+standings.forEach((p,i)=>{
+  const lead = (p.total===topScore && topScore>0) ? "lead" : "";
+  const aliveTxt = p.alive===6 ? "All 6 teams in play"
+                  : p.alive===0 ? "All teams eliminated"
+                  : `${p.alive} of 6 teams still in`;
+  board.insertAdjacentHTML("beforeend",`
+    <div class="row ${lead}">
+      <div class="rank">${i+1}</div>
+      <div class="who">
+        <div class="name">${p.name}</div>
+        <div class="sub">${aliveTxt}</div>
+      </div>
+      <div class="pts">
+        <div class="val">${p.total}</div>
+        <div class="unit">pts</div>
+      </div>
+    </div>`);
+});
+
+/* Squads */
+const squads = document.getElementById("squads");
+standings.forEach((p,i)=>{
+  const teamRows = p.teams
+    .slice()
+    .sort((a,b)=>teamPoints(b[2])-teamPoints(a[2]))
+    .map(t=>{
+      const pts = teamPoints(t[2]);
+      return `<div class="team">
+        <div class="flag">${t[1]}</div>
+        <div class="tn">${t[0]}</div>
+        <span class="badge ${badgeClass(t[2])}">${shortStage(t[2])}</span>
+        <div class="tpts ${pts===0?'zero':''}">${pts}</div>
+      </div>`;
+    }).join("");
+  squads.insertAdjacentHTML("beforeend",`
+    <div class="squad">
+      <div class="squad-head" onclick="this.parentElement.classList.toggle('open')">
+        <div class="left">
+          <div class="pos">${i+1}</div>
+          <div class="nm">${p.name}</div>
+        </div>
+        <div style="display:flex;align-items:center">
+          <div class="tot">${p.total}<small>points</small></div>
+          <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+      </div>
+      <div class="teams">${teamRows}</div>
+    </div>`);
+});
+
+document.getElementById("updated").textContent = UPDATED;
+</script>
+</body>
+</html>
