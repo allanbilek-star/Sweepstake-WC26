@@ -207,6 +207,70 @@
   @media (prefers-reduced-motion:reduce){
     *{transition:none!important}
   }
+  /* ===== CHAMPION CELEBRATION ===== */
+  .champ-banner{
+    position:relative;margin:26px 18px 4px;padding:30px 20px 26px;
+    text-align:center;border-radius:20px;overflow:hidden;
+    background:
+      radial-gradient(120% 140% at 50% 0%, rgba(244,195,58,.22) 0%, transparent 60%),
+      linear-gradient(180deg,#123528,#0c261c);
+    border:1px solid var(--gold-deep);
+    box-shadow:0 0 60px rgba(244,195,58,.12) inset;
+  }
+  .champ-eyebrow{
+    font-size:11px;letter-spacing:.4em;text-transform:uppercase;
+    color:var(--gold);font-weight:800;margin-bottom:10px;
+  }
+  .champ-trophy{font-size:60px;line-height:1;filter:drop-shadow(0 6px 18px rgba(244,195,58,.5));
+    animation:trophy-bob 2.4s ease-in-out infinite}
+  @keyframes trophy-bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-9px) rotate(3deg)}}
+  .champ-name{
+    font-family:"Archivo Black","Arial Black",sans-serif;
+    font-size:clamp(34px,11vw,60px);line-height:1;margin:10px 0 4px;
+    background:linear-gradient(180deg,#fff2c9,var(--gold) 55%,var(--gold-deep));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    letter-spacing:-.01em;
+  }
+  .champ-sub{color:var(--chalk);font-size:15px;font-weight:600}
+  .champ-sub b{color:var(--gold)}
+  .champ-prize{
+    display:inline-block;margin-top:14px;padding:8px 20px;border-radius:100px;
+    background:var(--gold);color:#1a1206;font-weight:800;font-size:15px;
+    letter-spacing:.02em;box-shadow:0 6px 20px rgba(244,195,58,.3);
+  }
+
+  /* Podium */
+  .podium{
+    display:flex;align-items:flex-end;justify-content:center;gap:10px;
+    margin:22px 18px 4px;
+  }
+  .pod{flex:1;max-width:150px;display:flex;flex-direction:column;align-items:center}
+  .pod .medal{font-size:26px;margin-bottom:6px}
+  .pod .pn{font-weight:800;font-size:15px;margin-bottom:2px;text-align:center}
+  .pod .pp{font-family:"Archivo Black",sans-serif;font-size:15px;color:var(--gold)}
+  .pod .bar{
+    width:100%;margin-top:8px;border-radius:10px 10px 0 0;
+    background:linear-gradient(180deg,var(--card-hi),var(--card));
+    border:1px solid var(--line);border-bottom:none;
+    display:flex;align-items:flex-start;justify-content:center;padding-top:8px;
+    font-family:"Archivo Black",sans-serif;font-size:20px;color:var(--muted);
+  }
+  .pod.p1 .bar{height:104px;background:linear-gradient(180deg,rgba(244,195,58,.28),var(--card));border-color:var(--gold-deep);color:var(--gold)}
+  .pod.p2 .bar{height:74px}
+  .pod.p3 .bar{height:54px}
+  .pod.p1 .pn{color:var(--gold)}
+
+  /* Confetti */
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+  .cf{position:absolute;top:-14px;width:9px;height:14px;opacity:.9;will-change:transform;
+    animation:cf-fall linear forwards}
+  @keyframes cf-fall{
+    0%{transform:translateY(-20px) rotate(0)}
+    100%{transform:translateY(102vh) rotate(720deg)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .cf,.champ-trophy{animation:none}
+  }
 </style>
 </head>
 <body>
@@ -220,7 +284,12 @@
   </div>
 </header>
 
+<div id="confetti"></div>
+
 <div class="wrap">
+
+  <div class="champ-banner" id="champBanner"></div>
+  <div class="podium" id="podium"></div>
 
   <div class="seclabel">Live Standings</div>
   <div class="board" id="board"></div>
@@ -253,8 +322,8 @@
 
   <footer>
     Last updated <span class="stamp" id="updated">—</span><br>
-    FINAL: Spain v Argentina, Sunday July 19 · 3rd-place playoff France v England today<br>
-    <span style="opacity:.7">Tap any squad to see team-by-team points</span>
+    Tournament complete · Spain are World Cup champions · Alisha wins the sweepstake 🏆<br>
+    <span style="opacity:.7">Congratulations Alisha! · Thanks for playing, everyone 🏆⚽</span>
   </footer>
 </div>
 
@@ -297,7 +366,7 @@ const PLAYERS = [
     ["Paraguay","🇵🇾","r16","elim"], ["Scotland","🏴󠁧󠁢󠁳󠁣󠁴󠁿","out"], ["New Zealand","🇳🇿","out"]
   ]},
   { name:"Paps",   handle:"Hassan", teams:[
-    ["Argentina","🇦🇷","final"], ["Belgium","🇧🇪","qf","elim"], ["Australia","🇦🇺","r32","elim"],
+    ["Argentina","🇦🇷","final","elim"], ["Belgium","🇧🇪","qf","elim"], ["Australia","🇦🇺","r32","elim"],
     ["Czechia","🇨🇿","out"], ["Uzbekistan","🇺🇿","out"], ["Qatar","🇶🇦","out"]
   ]},
   { name:"Baaj",   handle:"Baaj", teams:[
@@ -321,13 +390,13 @@ const PLAYERS = [
     ["Panama","🇵🇦","out"], ["Bosnia & Herzegovina","🇧🇦","r32","elim"], ["Curaçao","🇨🇼","out"]
   ]},
   { name:"Alisha", handle:"Alisha", teams:[
-    ["Spain","🇪🇸","final"], ["Senegal","🇸🇳","r32","elim"], ["Algeria","🇩🇿","r32","elim"],
+    ["Spain","🇪🇸","champion"], ["Senegal","🇸🇳","r32","elim"], ["Algeria","🇩🇿","r32","elim"],
     ["IR Iran","🇮🇷","out"], ["Congo DR","🇨🇩","r32","elim"], ["USA","🇺🇸","r16","elim"]
   ]}
 ];
 
 /* Date this data reflects */
-const UPDATED = "18 July 2026 · FINAL set";
+const UPDATED = "19 July 2026 · CHAMPIONS — Spain win the World Cup";
 
 /* ============================================================
    3.  RENDER
@@ -413,6 +482,68 @@ standings.forEach((p,i)=>{
 });
 
 document.getElementById("updated").textContent = UPDATED;
+
+/* ===== CHAMPION CELEBRATION ===== */
+(function(){
+  // Only celebrate once a champion team exists
+  const championExists = PLAYERS.some(p=>p.teams.some(t=>t[2]==="champion"));
+  const winner = standings[0];
+  // Find the winning team (the champion) in the winner's squad
+  let champTeam = null;
+  for(const t of winner.teams){ if(t[2]==="champion"){ champTeam = t; break; } }
+
+  const banner = document.getElementById("champBanner");
+  const podium = document.getElementById("podium");
+
+  if(championExists && champTeam){
+    banner.innerHTML = `
+      <div class="champ-eyebrow">Sweepstake Champion</div>
+      <div class="champ-trophy">🏆</div>
+      <div class="champ-name">${winner.name}</div>
+      <div class="champ-sub">crowned on <b>${champTeam[1]} ${champTeam[0]}</b> winning the World Cup</div>
+      <div class="champ-prize">🏆 ${winner.total} pts · wins the £80 pot</div>`;
+
+    // Podium: 2nd, 1st, 3rd order for classic look
+    const [p1,p2,p3] = standings;
+    podium.innerHTML = `
+      <div class="pod p2">
+        <div class="medal">🥈</div><div class="pn">${p2.name}</div>
+        <div class="pp">${p2.total}</div><div class="bar">2</div>
+      </div>
+      <div class="pod p1">
+        <div class="medal">🥇</div><div class="pn">${p1.name}</div>
+        <div class="pp">${p1.total}</div><div class="bar">1</div>
+      </div>
+      <div class="pod p3">
+        <div class="medal">🥉</div><div class="pn">${p3.name}</div>
+        <div class="pp">${p3.total}</div><div class="bar">3</div>
+      </div>`;
+
+    launchConfetti();
+  } else {
+    banner.style.display="none";
+    podium.style.display="none";
+  }
+
+  function launchConfetti(){
+    const wrap = document.getElementById("confetti");
+    const colors = ["#f4c33a","#3ddc84","#ffffff","#c89212","#eaf2ec","#f4c33a"];
+    const N = 130;
+    for(let i=0;i<N;i++){
+      const c = document.createElement("div");
+      c.className = "cf";
+      c.style.left = Math.random()*100 + "vw";
+      c.style.background = colors[i%colors.length];
+      c.style.animationDuration = (2.8 + Math.random()*2.6) + "s";
+      c.style.animationDelay = (Math.random()*2.2) + "s";
+      if(Math.random()>.5) c.style.borderRadius = "50%";
+      c.style.opacity = (0.6 + Math.random()*0.4).toFixed(2);
+      wrap.appendChild(c);
+    }
+    // Let confetti fall for a while, then clear so it doesn't loop forever
+    setTimeout(()=>{ wrap.innerHTML=""; }, 12000);
+  }
+})();
 </script>
 </body>
 </html>
